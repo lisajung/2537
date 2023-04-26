@@ -9,11 +9,13 @@ app.listen(3000, () => {
 const users = [
     {
         username: 'admin',
-        password: 'admin'
+        password: 'admin',
+        type: 'administrator'
     },
     {
         username: 'user1',
-        password: 'pass1'
+        password: 'pass1',
+        type: 'non-administrator'
     }
 ]
 
@@ -45,8 +47,10 @@ app.post('/login', (req, res) => {
     // set global variable to true if user is authenticated
     if (users.find((user) => user.username == req.body.username && user.password == req.body.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
+        req.session.loggedUsername = req.body.username;
+        req.session.loggedPassword = req.body.password;
     }
-    res.redirect('/protectedRoute');
+    res.redirect('/');
 });
 
 
@@ -57,10 +61,25 @@ const authenticatedOnly = (req, res, next) => {
     };
     next(); // allow next route to run 
 };
-
 app.use(authenticatedOnly);
+
 app.get('/protectedRoute', (req, res) => {
     res.send('<h1> protectedRoute <h1>');
+});
+
+
+// only for admin users
+const protectedRouteForAdminsOnlyMiddlewareFunction = (req, res, next) => {
+    if (
+        users.find((users) => users.username == req.session.loggedUsername && users.password == req.session.loggedPassword)?.type != 'administrator') {
+        return res.send('<h1> You are not an admin <h1>')
+    }
+    next(); // allow next route to run 
+};
+app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
+
+app.get('/protectedRouteForAdminsOnly', (req, res) => {
+    res.send('<h1> protectedRouteForAdminsOnly <h1>');
 });
 
 
