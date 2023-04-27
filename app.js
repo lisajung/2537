@@ -3,29 +3,25 @@ const app = express();
 const session = require('express-session');
 const usersModel = require('./models/w1users');
 
+// const { MongoDBStore } = require('connect-mongodb-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+
+
 app.listen(3000, () => {
     console.log('server is running on port 3000');
 });
 
-// TODO
-// replace the array with a database
-// const users = [
-//     {
-//         username: 'admin',
-//         password: 'admin',
-//         type: 'administrator'
-//     },
-//     {
-//         username: 'user1',
-//         password: 'pass1',
-//         type: 'non-administrator'
-//     }
-// ]
+var dbStore = new MongoDBStore({
+    uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
+    collection: 'mySessions'
+});
+
 
 //TODO
 // replace the in-memory array with a database session store
 app.use(session({
-    secret: 'secret',
+    secret: 'foo',
+    store: dbStore,
 }));
 
 //public route
