@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const usersModel = require('./models/w1users');
+const bcrypt = require('bcrypt');
 
 // const { MongoDBStore } = require('connect-mongodb-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
@@ -45,16 +46,18 @@ app.use(express.urlencoded({ extended: false }))
 
 app.post('/login', async (req, res) => {
     // set global variable to true if user is authenticated
-    const result = await usersModel.find({
+    const result = await usersModel.findOne({
         username: req.body.username,
-        password: req.body.password
     })
-    if (result) {
+    if (bcrypt.compareSync(req.body.password, result.password)) {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = req.body.username;
         req.session.loggedPassword = req.body.password;
+        res.redirect('/');
+    } else {
+        res.send('Wrong password');
     }
-    res.redirect('/');
+
 });
 
 
@@ -77,7 +80,6 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
     const result = await usersModel.findOne(
         {
             username: req.session.loggedUsername,
-            password: req.session.loggedPassword
         }
     )
     if (result?.type != 'administrator') {
