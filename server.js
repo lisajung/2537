@@ -1,11 +1,12 @@
 // getting-started.js
 const mongoose = require('mongoose');
 const app = require('./app');
+const dotenv = require('dotenv');
+dotenv.config();
 
 main().catch(err => console.log(err));
-
 async function main() {
-    await mongoose.connect('mongodb+srv://lisajung998:7IlSIcnoUP5ooGwa@cluster0.pkjtbxx.mongodb.net/comp2537w1?retryWrites=true&w=majority');
+    await mongoose.connect(`mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.pkjtbxx.mongodb.net/comp2537w1?retryWrites=true&w=majority`);
     // await mongoose.connect('mongodb://127.0.0.1:27017/comp2537w1');
 
     // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
