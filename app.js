@@ -11,7 +11,7 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 
 
 var dbStore = new MongoDBStore({
-    uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
+    uri: 'mongodb+srv://${process.env.ATLAS_DB_USER}:${process.env.ATLAS_DB_PASSWORD}@cluster0.pkjtbxx.mongodb.net/comp2537w1?retryWrites=true&w=majority',
     collection: 'mySessions'
 });
 
