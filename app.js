@@ -21,6 +21,8 @@ var dbStore = new MongoDBStore({
 app.use(session({
     secret: 'foo',
     store: dbStore,
+    resave: false,
+    saveUninitialized: false,
 }));
 
 //public route
