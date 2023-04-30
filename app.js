@@ -114,6 +114,10 @@ app.get('/protectedRouteForAdminsOnly', (req, res) => {
     res.send('<h1> protectedRouteForAdminsOnly <h1>');
 }); //may not need this stuff here deleted in vid
 
+app.get('*', (req, res) => {
+    res.status(404).send('<h1> 404 Page not found</h1>');
+});
+
 module.exports = app;
 
 
