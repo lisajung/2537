@@ -27,16 +27,72 @@ app.use(session({
 }));
 
 //public route
+// app.get('/', (req, res) => {
+//     res.send('<h1> Hello World <h1>');
+// });
+
 app.get('/', (req, res) => {
-    res.send('<h1> Hello World <h1>');
+    res.send(`
+        <h1>Welcome</h1>
+        <p>Please <a href="/signup">Sign up</a> or <a href="/login">Log in</a></p>
+    `);
 });
+
+app.get('/signup', (req, res) => {
+    res.send(`
+        <h1>Sign Up</h1>
+        <form action="/signup" method="post">
+            <input type="text" name="username" placeholder="Username" />
+            <br>
+            <input type="password" name="password" placeholder="Password" />
+            <br>
+            <input type="submit" value="Sign up" />
+        </form>
+    `);
+});
+
+const handleUserSignup = async (req, res, next) => {
+    try {
+        const { username, password, email } = req.body;
+
+        // Check if user already exists in the database
+        const userExists = await usersModel.findOne({ username });
+        if (userExists) {
+            return res.status(400).send('Username already exists');
+        }
+
+        // Hash the user's password before storing it in the database
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        // Create a new user object and save it to the database
+        const newUser = new usersModel({
+            username,
+            password: hashedPassword,
+        });
+        await newUser.save();
+
+        // Set the user as authenticated and redirect to the protected route
+        req.session.GLOBAL_AUTHENTICATED = true;
+        req.session.loggedUsername = username;
+        req.session.loggedPassword = hashedPassword;
+        res.redirect('/protectedRoute');
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+app.use(express.urlencoded({ extended: false }));
+app.post('/signup', handleUserSignup);
 
 
 app.get('/login', (req, res) => {
     res.send(`
+    <h1>Login</h1>
       <form action="/login" method="post">
         <input type="text" name="username" placeholder="Enter your username" />
+        <br>
         <input type="password" name="password" placeholder="Enter your password" />
+        <br>
         <input type="submit" value="Login" />
       </form>
     `)
@@ -55,7 +111,7 @@ app.post('/login', async (req, res) => {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
             req.session.loggedPassword = req.body.password;
-            res.redirect('/');
+            res.redirect('/protectedRoute');
         } else {
             res.send('Wrong password');
         }
@@ -112,7 +168,7 @@ app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
 app.get('/protectedRouteForAdminsOnly', (req, res) => {
     res.send('<h1> protectedRouteForAdminsOnly <h1>');
-}); //may not need this stuff here deleted in vid
+});
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
