@@ -119,7 +119,7 @@ app.post('/login', async (req, res) => {
         if (bcrypt.compareSync(req.body.password, result?.password)) {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
-            req.session.loggedPassword = bycrpt.hashSync(req.body.password, 10);
+            req.session.loggedPassword = req.body.password;
             req.session.cookie.maxAge = expireTime;
             res.redirect('/protectedRoute');
         } else {
@@ -201,4 +201,3 @@ app.get('*', (req, res) => {
 });
 
 module.exports = app;
-
