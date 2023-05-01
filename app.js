@@ -119,7 +119,7 @@ app.post('/login', async (req, res) => {
         if (bcrypt.compareSync(req.body.password, result?.password)) {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
-            req.session.loggedPassword = req.body.password;
+            req.session.loggedPassword = result?.password;
             req.session.cookie.maxAge = expireTime;
             res.redirect('/protectedRoute');
         } else {
@@ -150,8 +150,7 @@ app.get('/protectedRoute', (req, res) => {
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
     HTMLResponse = `
-        <h1> Protected Route <h1> 
-        <p> Welcome, ${username}! </p>
+        <h1> Welcome, ${username}! <h1> 
         <br>
         <img src="${imageName}" />
         <br>
