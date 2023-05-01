@@ -3,7 +3,7 @@ const app = express();
 const session = require('express-session');
 const usersModel = require('./models/w1users');
 const bcrypt = require('bcrypt');
-
+const expireTime = 60 * 60 * 1000;
 // const { MongoDBStore } = require('connect-mongodb-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -28,6 +28,10 @@ app.use(session({
 
 
 app.get('/', (req, res) => {
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        res.redirect('/protectedRoute');
+        return;
+    }
     res.send(`
         <h1>Welcome</h1>
         <p>Please <a href="/signup">Sign up</a> or <a href="/login">Log in</a></p>
@@ -35,6 +39,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        res.redirect('/protectedRoute');
+        return;
+    }
     res.send(`
         <h1>Sign Up</h1>
         <form action="/signup" method="post">
@@ -71,6 +79,7 @@ const handleUserSignup = async (req, res, next) => {
         req.session.GLOBAL_AUTHENTICATED = true;
         req.session.loggedUsername = username;
         req.session.loggedPassword = hashedPassword;
+        req.session.cookie.maxAge = expireTime;
         res.redirect('/protectedRoute');
     } catch (error) {
         console.log(error);
@@ -82,6 +91,10 @@ app.post('/signup', handleUserSignup);
 
 
 app.get('/login', (req, res) => {
+    if (req.session.GLOBAL_AUTHENTICATED) {
+        res.redirect('/protectedRoute');
+        return;
+    }
     res.send(`
     <h1>Login</h1>
       <form action="/login" method="post">
@@ -107,6 +120,7 @@ app.post('/login', async (req, res) => {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
             req.session.loggedPassword = req.body.password;
+            req.session.cookie.maxAge = expireTime;
             res.redirect('/protectedRoute');
         } else {
             res.send('Wrong password');
