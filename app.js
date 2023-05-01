@@ -26,10 +26,6 @@ app.use(session({
     saveUninitialized: false,
 }));
 
-//public route
-// app.get('/', (req, res) => {
-//     res.send('<h1> Hello World <h1>');
-// });
 
 app.get('/', (req, res) => {
     res.send(`
@@ -136,39 +132,64 @@ app.use(express.static('public')) // built-in middleware function in Express. It
 app.get('/protectedRoute', (req, res) => {
     // serve one of the three images randomly
     //generate a random number between 1 and 3
+    const username = req.session.loggedUsername;
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
     HTMLResponse = `
         <h1> Protected Route <h1> 
+        <p> Welcome, ${username}! </p>
         <br>
         <img src="${imageName}" />
+        <br>
+        <button onclick="logout()">Log Out</button>
         `
     res.send(HTMLResponse);
 });
 
 
-// only for admin users
-const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
-    try {
-        const result = await usersModel.findOne(
-            {
-                username: req.session.loggedUsername,
-            }
-        )
-        if (result?.type != 'administrator') {
-            return res.send('<h1> You are not an admin <h1>')
+
+// app.get('/logout', (req, res) => {
+//     req.session.destroy();
+//     var html = `
+//     You are logged out.
+//     `;
+//     res.send(HTMLResponse);
+// });
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect('/');
         }
-        next(); // allow next route to run 
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
-
-app.get('/protectedRouteForAdminsOnly', (req, res) => {
-    res.send('<h1> protectedRouteForAdminsOnly <h1>');
+    });
 });
+
+
+
+// only for admin users
+// const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
+//     try {
+//         const result = await usersModel.findOne(
+//             {
+//                 username: req.session.loggedUsername,
+//             }
+//         )
+//         if (result?.type != 'administrator') {
+//             return res.send('<h1> You are not an admin <h1>')
+//         }
+//         next(); // allow next route to run 
+
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
+// app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
+
+// app.get('/protectedRouteForAdminsOnly', (req, res) => {
+//     res.send('<h1> protectedRouteForAdminsOnly <h1>');
+// });
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
