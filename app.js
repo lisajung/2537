@@ -141,30 +141,21 @@ app.get('/protectedRoute', (req, res) => {
         <br>
         <img src="${imageName}" />
         <br>
-        <button onclick="logout()">Log Out</button>
+        <a href="/logout">Log Out</a>
         `
     res.send(HTMLResponse);
 });
 
 
 
-// app.get('/logout', (req, res) => {
-//     req.session.destroy();
-//     var html = `
-//     You are logged out.
-//     `;
-//     res.send(HTMLResponse);
-// });
-
 app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.log(err);
-        } else {
-            res.redirect('/');
-        }
-    });
+    req.session.destroy();
+    var html = `
+    You are logged out.
+    `;
+    res.send(html);
 });
+
 
 
 
@@ -196,7 +187,4 @@ app.get('*', (req, res) => {
 });
 
 module.exports = app;
-
-
-
 
