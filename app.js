@@ -154,8 +154,9 @@ app.post('/login', async (req, res) => {
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        // return res.status(401).json({ error: 'not authenticated' });
-        res.redirect('/');
+        // res.redirect('/');
+        return res.status(401).json({ error: 'not authenticated' });
+
     };
     next(); // allow next route to run 
 };
