@@ -4,6 +4,12 @@ const session = require('express-session');
 const usersModel = require('./models/w1users');
 const bcrypt = require('bcrypt');
 const expireTime = 60 * 60 * 1000;
+
+// 1 - import
+let ejs = require('ejs');
+// 2 - set view engine to ejs
+app.set('view engine', 'ejs')
+
 // const { MongoDBStore } = require('connect-mongodb-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -110,25 +116,25 @@ app.get('/login', (req, res) => {
 //GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }))
 
-// const Joi = require('joi');
+const Joi = require('joi');
 
 app.post('/login', async (req, res) => {
     // set global variable to true if user is authenticated
 
     //sanitize input using joi
-    // const schema = Joi.object({
-    //     password: Joi.string().min(3).required()
-    // });
+    const schema =
+        Joi.string().min(3)
 
-    // try {
-    //     console.log("req.body.password " + req.body.password);
-    //     const value = await schema.validateAsync(req.body);
-    // }
-    // catch (err) {
-    //     console.log(err);
-    //     console.log("Password cannot be less than 3 characters long");
-    //     return res.send("Password cannot be less than 3 characters long");
-    // }
+    try {
+        console.log("req.body.password " + req.body.password);
+        const value = await schema.validateAsync(req.body.password);
+        console.log("value " + value);
+    }
+    catch (err) {
+        console.log(err);
+        console.log("Password cannot be less than 3 characters long");
+        return res.send("Password cannot be less than 3 characters long");
+    }
 
     try {
         const result = await usersModel.findOne({
@@ -138,6 +144,7 @@ app.post('/login', async (req, res) => {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
             req.session.loggedPassword = result?.password;
+            req.session.loggedType = result?.type;
             req.session.cookie.maxAge = expireTime;
             res.redirect('/protectedRoute');
         } else {
@@ -173,14 +180,25 @@ app.get('/protectedRoute', (req, res) => {
     const username = req.session.loggedUsername;
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
-    HTMLResponse = `
-        <h1> Welcome, ${username}! <h1> 
-        <br>
-        <img src="${imageName}" />
-        <br>
-        <a href="/logout">Log Out</a>
-        `
-    res.send(HTMLResponse);
+
+    // HTMLResponse = `
+    //     <h1> Welcome, ${username}! <h1> 
+    //     <br>
+    //     <img src="${imageName}" />
+    //     <br>
+    //     <a href="/logout">Log Out</a>
+    //     `
+    // res.send(HTMLResponse);
+
+    // 3 - send data to ejs template
+
+    res.render('protectedRoute.ejs', {
+        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "todos": [
+            { name: "todo1", done: false },
+            { name: "todo2", done: true },
+            { name: "todo3", done: false }
+        ]
+    })
 });
 
 
@@ -193,6 +211,28 @@ app.get('/logout', (req, res) => {
     res.send(html);
 });
 
+//only for admin users
+const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
+    try {
+        const result = await usersModel.findOne(
+            {
+                username: req.session.loggedUsername,
+            }
+        )
+        if (result?.type != 'administrator') {
+            return res.send('<h1> You are not an admin <h1>')
+        }
+        next(); // allow next route to run 
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
+
+app.get('/protectedRouteForAdminsOnly', (req, res) => {
+    res.send('<h1> protectedRouteForAdminsOnly <h1>');
+});
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
