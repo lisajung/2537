@@ -154,12 +154,16 @@ app.post('/login', async (req, res) => {
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
     if (!req.session.GLOBAL_AUTHENTICATED) {
-        // res.redirect('/');
-        return res.status(401).json({ error: 'not authenticated' });
+        if (req.originalUrl.startsWith('/api/')) {
+            return res.status(401).json({ error: 'not authenticated' });
+        } else {
+            return res.redirect('/');
+        }
+    } else {
+        next();
+    }
+}
 
-    };
-    next(); // allow next route to run 
-};
 app.use(authenticatedOnly);
 
 app.use(express.static('public')) // built-in middleware function in Express. It serves static files and is based on serve-static.
