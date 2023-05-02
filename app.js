@@ -20,7 +20,7 @@ var dbStore = new MongoDBStore({
 //TODO
 // replace the in-memory array with a database session store
 app.use(session({
-    secret: 'foo',
+    secret: `${process.env.SESSIONS_SECRET}`,
     store: dbStore,
     resave: false,
     saveUninitialized: false,
@@ -110,13 +110,31 @@ app.get('/login', (req, res) => {
 //GLOBAL_AUTHENTICATED = false;
 app.use(express.urlencoded({ extended: false }))
 
+// const Joi = require('joi');
+
 app.post('/login', async (req, res) => {
     // set global variable to true if user is authenticated
+
+    //sanitize input using joi
+    // const schema = Joi.object({
+    //     password: Joi.string().min(3).required()
+    // });
+
+    // try {
+    //     console.log("req.body.password " + req.body.password);
+    //     const value = await schema.validateAsync(req.body);
+    // }
+    // catch (err) {
+    //     console.log(err);
+    //     console.log("Password cannot be less than 3 characters long");
+    //     return res.send("Password cannot be less than 3 characters long");
+    // }
+
     try {
         const result = await usersModel.findOne({
             username: req.body.username,
         })
-        if (bcrypt.compareSync(req.body.password, result?.password)) {
+        if (await bcrypt.compareSync(req.body.password, result?.password)) {
             req.session.GLOBAL_AUTHENTICATED = true;
             req.session.loggedUsername = req.body.username;
             req.session.loggedPassword = result?.password;
@@ -169,31 +187,6 @@ app.get('/logout', (req, res) => {
     res.send(html);
 });
 
-
-
-
-// only for admin users
-// const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => {
-//     try {
-//         const result = await usersModel.findOne(
-//             {
-//                 username: req.session.loggedUsername,
-//             }
-//         )
-//         if (result?.type != 'administrator') {
-//             return res.send('<h1> You are not an admin <h1>')
-//         }
-//         next(); // allow next route to run 
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
-// app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
-
-// app.get('/protectedRouteForAdminsOnly', (req, res) => {
-//     res.send('<h1> protectedRouteForAdminsOnly <h1>');
-// });
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
