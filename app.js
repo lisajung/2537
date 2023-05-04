@@ -168,6 +168,17 @@ const authenticatedOnly = (req, res, next) => {
         }
     } else {
         next();
+        //admin only 
+        // if (req.session.loggedType === 'administrator') {
+        //     if (req.originalUrl !== '/protectedRouteForAdminsOnly') {
+        //         return res.redirect('/protectedRouteForAdminsOnly'); // allow access to the next route
+        //     } else {
+        //         return next(); // prevent redirect loop
+        //     }
+        // } else {
+        //     return next(); // redirect to the default protected route
+        // }
+
     }
 }
 

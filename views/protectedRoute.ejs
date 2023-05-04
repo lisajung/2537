@@ -13,22 +13,32 @@
         Welcome <%= x %>!
             <br>
             <img src="<%= y %>" />
-            <br>
-            <a href="<%= z %>">Log Out</a>
+
 
             <% if (isAdmin) { %>
                 <h2> Only admins can see this </h2>
                 <% } %>
-
                     <ul>
                         <% todos.forEach(function(todoItem){ %>
                             <li>
-                                <%= todoItem.name %>
+                                <ul>
+                                    <li>
+                                        <%= todoItem.name %>
+                                    </li>
+                                    <li>
+                                        <%= todoItem.done %>
+                                    </li>
                             </li>
-                            <% }); %>
                     </ul>
+                    </li>
+                    <% }); %>
+                        </ul>
 
-                    <%- include('partials/footer.ejs'); %>
+
+
+                        <%- include('partials/footer.ejs'); %>
+                            <br>
+                            <a href="<%= z %>">Log Out</a>
 </body>
 
 </html>
