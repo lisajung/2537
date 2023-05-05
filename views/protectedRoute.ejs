@@ -31,7 +31,8 @@
                                     <%= user?.type %>
                                 </li>
                                 <li>
-                                    <form action="">
+                                    <form action="/promoteToAdmin" method="POST">
+                                        <input type = "hidden" name = "username" value = "<%= user.username %>">
                                         <input type="submit" value="Promote to admin">
 
                                     </form>

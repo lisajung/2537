@@ -254,6 +254,25 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     })
 });
 
+app.post('/promoteToAdmin', async (req, res) => {
+    try {
+    
+        // 1 - find the user to promote in the database
+        const userToPromote = await usersModel.findOne({ username: req.body.username });
+    
+        // 2 - update the user's type to administrator
+        userToPromote.type = 'administrator';
+        await userToPromote.save();
+    
+        // 3 - redirect to the protected route for admins
+        res.redirect('/protectedRouteForAdminsOnly');
+    
+      } catch (err) {
+        console.error(err);
+      }
+});
+   
+
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
 });
