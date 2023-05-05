@@ -146,7 +146,11 @@ app.post('/login', async (req, res) => {
             req.session.loggedPassword = result?.password;
             req.session.loggedType = result?.type;
             req.session.cookie.maxAge = expireTime;
-            res.redirect('/protectedRoute');
+            if (req.session.loggedType === 'administrator') {
+                res.redirect('/protectedRouteForAdminsOnly')
+            } else {
+                res.redirect('/protectedRoute');
+            }
         } else {
             res.send('Wrong password');
         }
@@ -168,16 +172,6 @@ const authenticatedOnly = (req, res, next) => {
         }
     } else {
         next();
-        //admin only 
-        // if (req.session.loggedType === 'administrator') {
-        //     if (req.originalUrl !== '/protectedRouteForAdminsOnly') {
-        //         return res.redirect('/protectedRouteForAdminsOnly'); // allow access to the next route
-        //     } else {
-        //         return next(); // prevent redirect loop
-        //     }
-        // } else {
-        //     return next(); // redirect to the default protected route
-        // }
 
     }
 }
@@ -203,6 +197,8 @@ app.get('/protectedRoute', (req, res) => {
 
     // 3 - send data to ejs template
 
+    console.log(req.session.loggedType)
+    console.log(req.session.loggedUsername)
     res.render('protectedRoute.ejs', {
         "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "todos": [
             { name: "todo1", done: false },
@@ -241,8 +237,19 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 };
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get('/protectedRouteForAdminsOnly', (req, res) => {
-    res.send('<h1> protectedRouteForAdminsOnly <h1>');
+app.get('/protectedRouteForAdminsOnly', async (req, res) => {
+    const username = req.session.loggedUsername;
+    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    const imageName = `00${randomImageNumber}.png`;
+
+    console.log(req.session.loggedType)
+    console.log(req.session.loggedUsername)
+    const filter = {};
+    const all = await usersModel.find(filter);
+    console.log(all);
+    res.render('protectedRoute.ejs', {
+        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
+    })
 });
 
 app.get('*', (req, res) => {

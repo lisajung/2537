@@ -17,22 +17,25 @@
 
             <% if (isAdmin) { %>
                 <h2> Only admins can see this </h2>
-                <% } %>
-                    <ul>
-                        <% todos.forEach(function(todoItem){ %>
-                            <li>
-                                <ul>
-                                    <li>
-                                        <%= todoItem.name %>
-                                    </li>
-                                    <li>
-                                        <%= todoItem.done %>
-                                    </li>
-                            </li>
+
+
+
+                <ul>
+                    <% users.forEach(function(user){ %>
+                        <li>
+                            <ul>
+                                <li>
+                                    <%= user.username %>
+                                </li>
+                                <li>
+                                    <%= user?.type %>
+                                </li>
+                        </li>
+                </ul>
+                </li>
+                <% }); %>
                     </ul>
-                    </li>
-                    <% }); %>
-                        </ul>
+                    <% } %>
 
 
 
