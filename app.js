@@ -168,7 +168,7 @@ const authenticatedOnly = (req, res, next) => {
         if (req.originalUrl.startsWith('/api/')) {
             return res.status(401).json({ error: 'not authenticated' });
         } else {
-            return res.redirect('/');
+            return res.redirect('/login');
         }
     } else {
         next();
@@ -241,6 +241,8 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const username = req.session.loggedUsername;
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
+
+    
 
     console.log(req.session.loggedType)
     console.log(req.session.loggedUsername)
