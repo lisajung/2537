@@ -10,6 +10,7 @@
 
 <body>
     <%- include('partials/header.ejs'); %>
+        <br>
         Welcome <%= x %>!
             <br>
             <img src="<%= y %>" />
@@ -32,7 +33,7 @@
                                 </li>
                                 <li>
                                     <form action="/promoteToAdmin" method="POST">
-                                        <input type = "hidden" name = "username" value = "<%= user.username %>">
+                                        <input type="hidden" name="username" value="<%= user.username %>">
                                         <input type="submit" value="Promote to admin">
 
                                     </form>
@@ -40,7 +41,7 @@
 
                                 <li>
                                     <form action="/demoteToUser" method="POST">
-                                        <input type = "hidden" name = "username" value = "<%= user.username %>">
+                                        <input type="hidden" name="username" value="<%= user.username %>">
                                         <input type="submit" value="Deomote to user">
 
                                     </form>
@@ -54,8 +55,8 @@
 
 
                         <%- include('partials/footer.ejs'); %>
-                            <br>
-                            <a href="<%= z %>">Log Out</a>
+                            <!-- <br>
+                            <a href="<%= z %>">Log Out</a> -->
 </body>
 
 </html>

@@ -186,16 +186,7 @@ app.get('/protectedRoute', (req, res) => {
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
 
-    // HTMLResponse = `
-    //     <h1> Welcome, ${username}! <h1> 
-    //     <br>
-    //     <img src="${imageName}" />
-    //     <br>
-    //     <a href="/logout">Log Out</a>
-    //     `
-    // res.send(HTMLResponse);
-
-    // 3 - send data to ejs template
+    // send data to ejs template
 
     console.log(req.session.loggedType)
     console.log(req.session.loggedUsername)
