@@ -39,7 +39,8 @@
                                 </li>
 
                                 <li>
-                                    <form action="">
+                                    <form action="/demoteToUser" method="POST">
+                                        <input type = "hidden" name = "username" value = "<%= user.username %>">
                                         <input type="submit" value="Deomote to user">
 
                                     </form>

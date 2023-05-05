@@ -272,6 +272,16 @@ app.post('/promoteToAdmin', async (req, res) => {
       }
 });
    
+app.post('/demoteToUser', async (req, res) => {
+    try {
+        const userToDemote = await usersModel.findOne({username: req.body.username});
+        userToDemote.type = 'non-administrator';
+        await userToDemote.save();
+        res.redirect('/protectedRouteForAdminsOnly');
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 app.get('*', (req, res) => {
     res.status(404).send('<h1> 404 Page not found</h1>');
