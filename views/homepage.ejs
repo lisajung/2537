@@ -9,11 +9,26 @@
 </head>
 
 <body>
-    <%- include('partials/header.ejs'); %>
-        
+    <%- include('partials/loginnav.ejs'); %>
+        <div class="d-flex flex-column align-items-center">
+            <h1 class="mb-4">
+                <%= title %>
+            </h1>
+            <button type="button" class="btn btn-primary btn-lg mb-4"><a href="<%= signupUrl %>" class="text-white">Sign
+                    up</a></button>
+            <button type="button" class="btn btn-secondary btn-lg"><a href="<%= loginUrl %>" class="text-white">Log
+                    in</a></button>
 
-                        <%- include('partials/footer.ejs'); %>
-                         
+        </div>
+
+
+
+
+
+
+
+        <%- include('partials/footer.ejs'); %>
+
 </body>
 
 </html>

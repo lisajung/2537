@@ -38,10 +38,8 @@ app.get('/', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.send(`
-        <h1>Welcome</h1>
-        <p>Please <a href="/signup">Sign up</a> or <a href="/login">Log in</a></p>
-    `);
+    res.render('homepage.ejs', { title: 'Welcome', signupUrl: '/signup', loginUrl: '/login' });
+
 });
 
 app.get('/signup', (req, res) => {
@@ -233,7 +231,7 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const randomImageNumber = Math.floor(Math.random() * 3) + 1;
     const imageName = `00${randomImageNumber}.png`;
 
-    
+
 
     console.log(req.session.loggedType)
     console.log(req.session.loggedUsername)
@@ -247,25 +245,25 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
 
 app.post('/promoteToAdmin', async (req, res) => {
     try {
-    
+
         // 1 - find the user to promote in the database
-        const userToPromote = await usersModel.findOne({ username: req.body.username });
-    
+        const userToPromote = await usersModel.findOne({ username: req.body.username});
+
         // 2 - update the user's type to administrator
         userToPromote.type = 'administrator';
         await userToPromote.save();
-    
+
         // 3 - redirect to the protected route for admins
         res.redirect('/protectedRouteForAdminsOnly');
-    
-      } catch (err) {
+
+    } catch (err) {
         console.error(err);
-      }
+    }
 });
-   
+
 app.post('/demoteToUser', async (req, res) => {
     try {
-        const userToDemote = await usersModel.findOne({username: req.body.username});
+        const userToDemote = await usersModel.findOne({ username: req.body.username });
         userToDemote.type = 'non-administrator';
         await userToDemote.save();
         res.redirect('/protectedRouteForAdminsOnly');
