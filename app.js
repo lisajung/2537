@@ -99,16 +99,17 @@ app.get('/login', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.send(`
-    <h1>Login</h1>
-      <form action="/login" method="post">
-        <input type="text" name="username" placeholder="Enter your username" />
-        <br>
-        <input type="password" name="password" placeholder="Enter your password" />
-        <br>
-        <input type="submit" value="Login" />
-      </form>
-    `)
+    // res.send(`
+    // <h1>Login</h1>
+    //   <form action="/login" method="post">
+    //     <input type="text" name="username" placeholder="Enter your username" />
+    //     <br>
+    //     <input type="password" name="password" placeholder="Enter your password" />
+    //     <br>
+    //     <input type="submit" value="Login" />
+    //   </form>
+    // `)
+    res.render('login.ejs', { title: 'Login', loginUrl: '/login' })
 });
 
 //GLOBAL_AUTHENTICATED = false;
@@ -155,7 +156,6 @@ app.post('/login', async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-
 
 });
 
