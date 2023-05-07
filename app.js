@@ -47,16 +47,17 @@ app.get('/signup', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.send(`
-        <h1>Sign Up</h1>
-        <form action="/signup" method="post">
-            <input type="text" name="username" placeholder="Username" />
-            <br>
-            <input type="password" name="password" placeholder="Password" />
-            <br>
-            <input type="submit" value="Sign up" />
-        </form>
-    `);
+    // res.send(`
+    //     <h1>Sign Up</h1>
+    //     <form action="/signup" method="post">
+    //         <input type="text" name="username" placeholder="Username" />
+    //         <br>
+    //         <input type="password" name="password" placeholder="Password" />
+    //         <br>
+    //         <input type="submit" value="Sign up" />
+    //     </form>
+    // `);
+    res.render('signin.ejs', { title: 'Sign Up', signupUrl: '/signup' })
 });
 
 const handleUserSignup = async (req, res, next) => {
