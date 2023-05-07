@@ -32,14 +32,22 @@ app.use(session({
     saveUninitialized: false,
 }));
 
+const navLinks = [
+    {name: 'Home', link: '/protectedRoute'},
+    {name: 'Admin', link: '/protectedRouteForAdminsOnly'},
 
+]
+
+const websiteName = [
+    {message: "Lisa's website 2023"}
+]
 
 app.get('/', (req, res) => {
     if (req.session.GLOBAL_AUTHENTICATED) {
         res.redirect('/protectedRoute');
         return;
     }
-    res.render('homepage.ejs', { title: 'Welcome', signupUrl: '/signup', loginUrl: '/login' });
+    res.render('homepage.ejs', { title: 'Welcome', signupUrl: '/signup', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName}) 
 
 });
 
@@ -48,17 +56,7 @@ app.get('/signup', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    // res.send(`
-    //     <h1>Sign Up</h1>
-    //     <form action="/signup" method="post">
-    //         <input type="text" name="username" placeholder="Username" />
-    //         <br>
-    //         <input type="password" name="password" placeholder="Password" />
-    //         <br>
-    //         <input type="submit" value="Sign up" />
-    //     </form>
-    // `);
-    res.render('signin.ejs', { title: 'Sign Up', signupUrl: '/signup' })
+    res.render('signin.ejs', { title: 'Sign Up', signupUrl: '/signup', "navLinks": navLinks, "websiteName": websiteName})
 });
 
 const handleUserSignup = async (req, res, next) => {
@@ -101,17 +99,7 @@ app.get('/login', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    // res.send(`
-    // <h1>Login</h1>
-    //   <form action="/login" method="post">
-    //     <input type="text" name="username" placeholder="Enter your username" />
-    //     <br>
-    //     <input type="password" name="password" placeholder="Enter your password" />
-    //     <br>
-    //     <input type="submit" value="Login" />
-    //   </form>
-    // `)
-    res.render('login.ejs', { title: 'Login', loginUrl: '/login' })
+    res.render('login.ejs', { title: 'Login', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName})
 });
 
 //GLOBAL_AUTHENTICATED = false;
@@ -148,11 +136,6 @@ app.post('/login', async (req, res) => {
             req.session.loggedType = result?.type;
             req.session.cookie.maxAge = expireTime;
             res.redirect('/protectedRoute');
-            // if (req.session.loggedType === 'administrator') {
-            //     res.redirect('/protectedRouteForAdminsOnly')
-            // } else {
-            //     res.redirect('/protectedRoute');
-            // }
         } else {
             res.send('Wrong password');
         }
@@ -184,8 +167,7 @@ app.get('/protectedRoute', async (req, res) => {
     // serve one of the three images randomly
     //generate a random number between 1 and 3
     const username = req.session.loggedUsername;
-    // const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    // const imageName = `00${randomImageNumber}.png`;
+
     const randomImageNumbers = [];
     while (randomImageNumbers.length < 3) {
         const randomImageNumber = Math.floor(Math.random() * 3) + 1;
@@ -205,25 +187,16 @@ app.get('/protectedRoute', async (req, res) => {
     const all = await usersModel.find(filter);
     console.log(all);
     res.render('protectedRoute.ejs', {
-        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
+        "x": username, "y": imageName, "z": "/logout", "navLinks": navLinks, "websiteName": websiteName
     })
-    // res.render('protectedRoute.ejs', {
-    //     "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "todos": [
-    //         { name: "todo1", done: false },
-    //         { name: "todo2", done: true },
-    //         { name: "todo3", done: false }
-    //     ]
-    // })
+
 });
 
 
 
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    var html = `
-    You are logged out.
-    `;
-    res.send(html);
+    res.redirect('/');
 });
 
 //only for admin users
@@ -236,7 +209,7 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
         )
         if (result?.type != 'administrator') {
             res.status(403);
-            res.render("error.ejs", { "title": "ERROR MESSAGE", "error": "You are not an admin" });
+            res.render("error.ejs", { "title": "ERROR MESSAGE", "error": "You are not an admin", "navLinks": navLinks, "websiteName": websiteName});
             return;
         }
         next(); // allow next route to run 
@@ -249,10 +222,6 @@ app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
 app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const username = req.session.loggedUsername;
-    // const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    // const imageName = `00${randomImageNumber}.png`;
-
-
 
     console.log(req.session.loggedType)
     console.log(req.session.loggedUsername)
@@ -260,7 +229,7 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const all = await usersModel.find(filter);
     console.log(all);
     res.render('protectedRouteForAdminsOnly.ejs', {
-        "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
+        "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all, "navLinks": navLinks, "websiteName": websiteName
     })
 });
 
@@ -295,7 +264,7 @@ app.post('/demoteToUser', async (req, res) => {
 
 app.get('*', (req, res) => {
     res.status(404);
-    res.render("404.ejs", { "title": "ERROR MESSAGE", "dneerror": "404 Page not found" });
+    res.render("404.ejs", { "title": "ERROR MESSAGE", "dneerror": "404 Page not found", "navLinks": navLinks, "websiteName": websiteName });
     return;
 
 });
