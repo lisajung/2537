@@ -10,45 +10,43 @@
 
 <body>
     <%- include('partials/header.ejs'); %>
+        <% if (isAdmin) { %>
+            <h2> Only admins can see this </h2>
 
-            <% if (isAdmin) { %>
-                <h2> Only admins can see this </h2>
-
-                <ul>
-                    <% users.forEach(function(user){ %>
-                        <li>
-                            <ul>
-                                <li>
-                                    <%= user.username %>
-                                </li>
-                                <li>
-                                    <%= user?.type %>
-                                </li>
-                                <li>
-                                    <form action="/promoteToAdmin" method="POST">
-                                        <input type="hidden" name="username" value="<%= user.username %>">
-                                        <input type="submit" value="Promote to admin">
-
-                                    </form>
-                                </li>
-
-                                <li>
-                                    <form action="/demoteToUser" method="POST">
-                                        <input type="hidden" name="username" value="<%= user.username %>">
-                                        <input type="submit" value="Deomote to user">
-
-                                    </form>
-                                </li>
-                        </li>
-                </ul>
-                </li>
-                <% }); %>
-                    </ul>
-                    <% } %>
-                        <a class="nav-item nav-link" href="<%= z %>">Log Out</a>
+            <ul class="list-group">
+                <% users.forEach(function(user){ %>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <%= user.username %>
+                            </div>
+                            <div class="col-md-4">
+                                <%= user?.type %>
+                            </div>
+                            <div class="col-md-4">
+                                <form action="/promoteToAdmin" method="POST">
+                                    <input type="hidden" name="username" value="<%= user.username %>">
+                                    <button type="submit" class="btn btn-primary btn-sm mb-2">Promote to admin</button>
+                                </form>
+                                <form action="/demoteToUser" method="POST">
+                                    <input type="hidden" name="username" value="<%= user.username %>">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Demote to user</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                    <% }); %>
+            </ul>
+            <% } %>
 
 
-                        <%- include('partials/footer.ejs'); %>
+
+
+
+                <button class="btn btn-lg btn-warning btn-sm mt-2 ml-2" type="submit" href="<%= z %>">Log out</button>
+
+
+                <%- include('partials/footer.ejs'); %>
 
 
 </body>

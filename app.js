@@ -33,6 +33,7 @@ app.use(session({
 }));
 
 
+
 app.get('/', (req, res) => {
     if (req.session.GLOBAL_AUTHENTICATED) {
         res.redirect('/protectedRoute');
@@ -293,7 +294,10 @@ app.post('/demoteToUser', async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-    res.status(404).send('<h1> 404 Page not found</h1>');
+    res.status(404);
+    res.render("404.ejs", { "title": "ERROR MESSAGE", "dneerror": "404 Page not found" });
+    return;
+
 });
 
 module.exports = app;
