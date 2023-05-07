@@ -33,13 +33,13 @@ app.use(session({
 }));
 
 const navLinks = [
-    {name: 'Home', link: '/protectedRoute'},
-    {name: 'Admin', link: '/protectedRouteForAdminsOnly'},
+    { name: 'Home', link: '/protectedRoute' },
+    { name: 'Admin', link: '/protectedRouteForAdminsOnly' },
 
 ]
 
 const websiteName = [
-    {message: "Lisa's website 2023"}
+    { message: "Lisa's website 2023" }
 ]
 
 app.get('/', (req, res) => {
@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.render('homepage.ejs', { title: 'Welcome', signupUrl: '/signup', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName}) 
+    res.render('homepage.ejs', { title: 'Welcome', signupUrl: '/signup', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName })
 
 });
 
@@ -56,7 +56,7 @@ app.get('/signup', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.render('signin.ejs', { title: 'Sign Up', signupUrl: '/signup', "navLinks": navLinks, "websiteName": websiteName})
+    res.render('signin.ejs', { title: 'Sign Up', signupUrl: '/signup', "navLinks": navLinks, "websiteName": websiteName })
 });
 
 const handleUserSignup = async (req, res, next) => {
@@ -99,7 +99,7 @@ app.get('/login', (req, res) => {
         res.redirect('/protectedRoute');
         return;
     }
-    res.render('login.ejs', { title: 'Login', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName})
+    res.render('login.ejs', { title: 'Login', loginUrl: '/login', "navLinks": navLinks, "websiteName": websiteName })
 });
 
 //GLOBAL_AUTHENTICATED = false;
@@ -121,8 +121,7 @@ app.post('/login', async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        console.log("Password cannot be less than 3 characters long");
-        return res.send("Password cannot be less than 3 characters long");
+        return res.render("passwordError.ejs", { "title": "ERROR MESSAGE", "passwordError": "Password cannot be less than 3 characters long", "navLinks": navLinks, "websiteName": websiteName });
     }
 
     try {
@@ -209,7 +208,7 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
         )
         if (result?.type != 'administrator') {
             res.status(403);
-            res.render("error.ejs", { "title": "ERROR MESSAGE", "error": "You are not an admin", "navLinks": navLinks, "websiteName": websiteName});
+            res.render("error.ejs", { "title": "ERROR MESSAGE", "error": " 403 You are not an admin", "navLinks": navLinks, "websiteName": websiteName });
             return;
         }
         next(); // allow next route to run 
