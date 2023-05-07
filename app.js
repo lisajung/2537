@@ -146,11 +146,12 @@ app.post('/login', async (req, res) => {
             req.session.loggedPassword = result?.password;
             req.session.loggedType = result?.type;
             req.session.cookie.maxAge = expireTime;
-            if (req.session.loggedType === 'administrator') {
-                res.redirect('/protectedRouteForAdminsOnly')
-            } else {
-                res.redirect('/protectedRoute');
-            }
+            res.redirect('/protectedRoute');
+            // if (req.session.loggedType === 'administrator') {
+            //     res.redirect('/protectedRouteForAdminsOnly')
+            // } else {
+            //     res.redirect('/protectedRoute');
+            // }
         } else {
             res.send('Wrong password');
         }
@@ -178,24 +179,40 @@ const authenticatedOnly = (req, res, next) => {
 app.use(authenticatedOnly);
 
 app.use(express.static('public')) // built-in middleware function in Express. It serves static files and is based on serve-static.
-app.get('/protectedRoute', (req, res) => {
+app.get('/protectedRoute', async (req, res) => {
     // serve one of the three images randomly
     //generate a random number between 1 and 3
     const username = req.session.loggedUsername;
-    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    const imageName = `00${randomImageNumber}.png`;
+    // const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    // const imageName = `00${randomImageNumber}.png`;
+    const randomImageNumbers = [];
+    while (randomImageNumbers.length < 3) {
+        const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+        if (!randomImageNumbers.includes(randomImageNumber)) {
+            randomImageNumbers.push(randomImageNumber);
+        }
+    }
+    const imageName = randomImageNumbers.map(n => `00${n}.png`);
 
     // send data to ejs template
 
     console.log(req.session.loggedType)
     console.log(req.session.loggedUsername)
+    console.log(req.session.loggedType)
+    console.log(req.session.loggedUsername)
+    const filter = {};
+    const all = await usersModel.find(filter);
+    console.log(all);
     res.render('protectedRoute.ejs', {
-        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "todos": [
-            { name: "todo1", done: false },
-            { name: "todo2", done: true },
-            { name: "todo3", done: false }
-        ]
+        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
     })
+    // res.render('protectedRoute.ejs', {
+    //     "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "todos": [
+    //         { name: "todo1", done: false },
+    //         { name: "todo2", done: true },
+    //         { name: "todo3", done: false }
+    //     ]
+    // })
 });
 
 
@@ -217,7 +234,9 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
             }
         )
         if (result?.type != 'administrator') {
-            return res.send('<h1> You are not an admin <h1>')
+            res.status(403);
+            res.render("error.ejs", { "title": "ERROR MESSAGE", "error": "You are not an admin" });
+            return;
         }
         next(); // allow next route to run 
 
@@ -229,8 +248,8 @@ app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
 app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const username = req.session.loggedUsername;
-    const randomImageNumber = Math.floor(Math.random() * 3) + 1;
-    const imageName = `00${randomImageNumber}.png`;
+    // const randomImageNumber = Math.floor(Math.random() * 3) + 1;
+    // const imageName = `00${randomImageNumber}.png`;
 
 
 
@@ -239,8 +258,8 @@ app.get('/protectedRouteForAdminsOnly', async (req, res) => {
     const filter = {};
     const all = await usersModel.find(filter);
     console.log(all);
-    res.render('protectedRoute.ejs', {
-        "x": username, "y": imageName, "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
+    res.render('protectedRouteForAdminsOnly.ejs', {
+        "z": "/logout", "isAdmin": req.session.loggedType == 'administrator', "users": all
     })
 });
 
@@ -248,7 +267,7 @@ app.post('/promoteToAdmin', async (req, res) => {
     try {
 
         // 1 - find the user to promote in the database
-        const userToPromote = await usersModel.findOne({ username: req.body.username});
+        const userToPromote = await usersModel.findOne({ username: req.body.username });
 
         // 2 - update the user's type to administrator
         userToPromote.type = 'administrator';
